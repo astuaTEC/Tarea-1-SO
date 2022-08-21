@@ -18,7 +18,7 @@ void write_file(int sockfd)
         if (n <= 0)
         {
             break;
-            return;
+            //return;
         }
         fprintf(fp, "%s", buffer);
         bzero(buffer, SIZE);
@@ -73,6 +73,8 @@ int main()
     printf("Ip %s  \n", inet_ntop(AF_INET, &(new_addr.sin_addr), str, INET_ADDRSTRLEN));
     write_file(new_sock);
     printf("[+]Data written in the file successfully.\n");
+    
+    
 
     return 0;
 }

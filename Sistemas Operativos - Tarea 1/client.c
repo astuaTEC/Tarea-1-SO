@@ -19,10 +19,10 @@ char filename[40]; // = "send.txt";
 // https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
 
 int fsize(FILE *fp){
-    int prev=ftell(fp);
+    int prev = ftell(fp);
     fseek(fp, 0L, SEEK_END);
-    int sz=ftell(fp);
-    fseek(fp,prev,SEEK_SET); //go back to where we were
+    int sz = ftell(fp);
+    fseek(fp, prev, SEEK_SET); // go back to where we were
     return sz;
 }
 
@@ -52,12 +52,6 @@ void send_file(FILE *fp, int sockfd)
     bzero(totalFile, fileSize);
 }
 
-void exitMenu(){
-
-    
-
-}
-
 void checkFile(){
 
     printf("Ingrese el nombre del archivo: ");
@@ -72,21 +66,24 @@ void checkFile(){
 
     send_file(fp, sockfd);
     printf("[+]File data sent successfully.\n");
+    fp = NULL;
     
     char resp;
 
-    while( tolower(resp) != *"y" || tolower(resp) != *"n"){
+    while( strcmp(&resp, "y") != 0 && strcmp(&resp, "n") != 0) { 
         printf("Le gustaria enviar un archivo adicional? [y/n] ");
         scanf("%c", &resp);
+    }
 
-        if(tolower(resp) == *"y"){
-            checkFile();
-        }
-        else if (tolower(resp) == *"n")  {
-            printf("[+]Closing the connection.\n");
-            close(sockfd);
-            break;
-        }
+    if (strcmp(&resp, "y") == 0)
+    {
+        checkFile();
+    }
+    else if (strcmp(&resp, "n") == 0)
+    {
+        printf("[+]Closing the connection.\n");
+        close(sockfd);
+        return;
     }
 }
 
@@ -125,10 +122,6 @@ void establishConnection(){
 
 int main()
 {
-
-    // printf("[+]Closing the connection.\n");
-    // close(sockfd);
-
     establishConnection();
 
     return 0;
