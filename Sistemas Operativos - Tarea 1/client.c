@@ -71,8 +71,8 @@ void checkFile(){
     char resp;
 
     while( strcmp(&resp, "y") != 0 && strcmp(&resp, "n") != 0) { 
-        printf("Le gustaria enviar un archivo adicional? [y/n] ");
         scanf("%c", &resp);
+        printf("Le gustaria enviar un archivo adicional? [y/n]\n");
     }
 
     if (strcmp(&resp, "y") == 0)
@@ -109,7 +109,7 @@ void establishConnection(){
     server_addr.sin_addr.s_addr = inet_addr(ip);
 
     e = connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr));
-    if (e == -1)
+    if (e < 0)
     {
         perror("[-]Error in socket");
         // exit(1);
