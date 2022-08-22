@@ -29,11 +29,15 @@ void write_file(char *buffer)
 
     fp = fopen(filename, "w");
     
-    chunk = strtok(NULL, "");
+    chunk = strtok(NULL, ";");
 
     fprintf(fp, "%s", chunk);
+
+    // printf("Chunk: %s\n", chunk);
+
     bzero(copyBuffer, MAX_BUFFER);
     bzero(filename, 50);
+    bzero(chunk, sizeof(chunk));
 }
 
 
@@ -97,21 +101,12 @@ int main(int argc, char *argv[]){
             }
         }
 
-        sleep(1);
-        
-        /*bzero(buffer, BUFFERSIZE);
-        fgets(buffer, BUFFERSIZE, stdin);
-        n = write(newSockfd, buffer, strlen(buffer));
-        if (n < 0)
-        {
-            error("Error on writing");
-        }*/
+        sleep(0.5);
     }
-
 
     close(sockfd);
     close(newSockfd);
-
+    
     // main(argc, argv);
     return 0;
 

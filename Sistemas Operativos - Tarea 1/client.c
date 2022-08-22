@@ -6,14 +6,13 @@
 #include <ctype.h>
 #include <pthread.h>
 
-#define SIZE 1024
+#define SIZE 4096
 
 
 char ip[15]; // = "192.168.100.97";
 int port; // = 8080;
 int e;
 int sockfd;
-int *flag = 0;
 struct sockaddr_in server_addr;
 FILE *fp;
 char filename[40]; // = "send.txt";
@@ -37,7 +36,7 @@ void send_file(FILE *fp, int sockfd, char *name)
 
     char data[SIZE] = {0};
 
-    char totalFile[fileSize];
+    char totalFile[fileSize+50]; // 50: Fit for the name
 
     strcat(totalFile, strcat(name, ";"));
 
@@ -88,8 +87,8 @@ void *checkFile(){
     {
         printf("[+]Closing the connection.\n");
         close(sockfd);
-        *flag = 1;
-        pthread_exit(NULL);
+        pthread_cancel(t1);
+        pthread_cancel(t2);
     }
 }
 
@@ -97,9 +96,6 @@ void *receiveMessage(){
     int n;
     char buffer[4096]; 
     while(1){
-        if(flag){
-            break;
-        }
 
         n = read(sockfd, buffer, 4096);
         if(n < 0){
@@ -111,7 +107,7 @@ void *receiveMessage(){
             bzero(buffer, 4096);
         }
 
-        sleep(0.05);
+        sleep(0.5);
     }
 }
 
@@ -155,7 +151,6 @@ void establishConnection(){
 
 int main()
 {
-
     establishConnection();
 
     return 0;
