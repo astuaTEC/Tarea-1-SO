@@ -9,7 +9,9 @@
 #include <arpa/inet.h>
 #include <sys/stat.h>
 #include "config.h"
+#include "consonantCounter.h"
 
+char consonants[1024];
 
 void error(const char *msg){
     perror(msg);
@@ -33,11 +35,14 @@ void write_file(char *buffer)
 
     fprintf(fp, "%s", chunk);
 
+    sprintf(consonants, "%d", consonantCounter(chunk));
+    
     // printf("Chunk: %s\n", chunk);
+    fclose(fp);
 
     bzero(copyBuffer, MAX_BUFFER);
     bzero(filename, 50);
-    bzero(chunk, sizeof(chunk));
+    bzero(chunk, strlen(chunk));
 }
 
 
@@ -49,8 +54,8 @@ int main(int argc, char *argv[]){
     // }
     mkdir(DIRECTORY, S_IRWXU);
 
-    int sockfd, newSockfd, port, n;
-    char buffer[BUFFERSIZE], inBuffer[MAX_BUFFER];
+    int sockfd, newSockfd, n;
+    char inBuffer[MAX_BUFFER];
 
     struct sockaddr_in serv_addr, cli_addr;
     socklen_t clilen;
@@ -94,19 +99,21 @@ int main(int argc, char *argv[]){
         if (strlen(inBuffer) > 0)
         {
             write_file(inBuffer);
-            n = write(newSockfd, "Archivo recibido", 17);
+            n = write(newSockfd, consonants, strlen(consonants));
             if (n < 0)
             {
                 error("Error on writing");
             }
         }
 
-        sleep(0.5);
+        bzero(consonants, strlen(consonants));
+
+        sleep(0.2);
     }
 
     close(sockfd);
     close(newSockfd);
-    
+
     // main(argc, argv);
     return 0;
 
