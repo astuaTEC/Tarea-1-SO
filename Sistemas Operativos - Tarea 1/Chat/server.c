@@ -21,7 +21,7 @@ int main(int argc, char *argv[]){
     }
 
     int sockfd, newSockfd, port, n;
-    char buffer[65000];
+    char buffer[255], inBuffer[65000];
 
     struct sockaddr_in serv_addr, cli_addr;
     socklen_t clilen;
@@ -56,29 +56,27 @@ int main(int argc, char *argv[]){
 
     while (1)
     {
-        bzero(buffer, 65000);
-        n = read(newSockfd, buffer, 65000);
-        if(n < 0){
+        bzero(inBuffer, 65000);
+        n = read(newSockfd, inBuffer, 65000);
+        if (n < 0)
+        {
             error("Error on reading");
         }
 
-        printf("Client: %s", buffer);
+        printf("Client: %s", inBuffer);
+        
         bzero(buffer, 255);
         fgets(buffer, 255, stdin);
-
         n = write(newSockfd, buffer, strlen(buffer));
-        if(n < 0){
+        if (n < 0)
+        {
             error("Error on writing");
-        }
-
-        int i = strncmp("Bye", buffer, 3);
-        if (i == 0){
-            break;
         }
     }
 
-    close(newSockfd);
     close(sockfd);
+    main(argc, argv);
+
     return 0;
 
 }

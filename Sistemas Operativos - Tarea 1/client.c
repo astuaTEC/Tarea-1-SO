@@ -4,6 +4,7 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <ctype.h>
+#include <pthread.h>
 
 #define SIZE 1024
 
@@ -15,6 +16,7 @@ int sockfd;
 struct sockaddr_in server_addr;
 FILE *fp;
 char filename[40]; // = "send.txt";
+pthread_t t1, t2; // threads are to execute send and recive simultaneusly
 
 // https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
 
@@ -52,7 +54,7 @@ void send_file(FILE *fp, int sockfd)
     bzero(totalFile, fileSize);
 }
 
-void checkFile(){
+void *checkFile(){
 
     printf("Ingrese el nombre del archivo: ");
     scanf("%s", filename);
@@ -83,7 +85,24 @@ void checkFile(){
     {
         printf("[+]Closing the connection.\n");
         close(sockfd);
-        return;
+        pthread_exit(&t1);
+        pthread_exit(&t2);
+    }
+}
+
+void *receiveMessage(){
+    int n;
+    char buffer[4096]; 
+    while(1){
+        n = read(sockfd, buffer, 4096);
+        if(n < 0){
+            perror("Error on reading");
+        }
+
+        printf("Server: %s", buffer);
+        bzero(buffer, 4096);
+
+        sleep(1);
     }
 }
 
@@ -117,11 +136,17 @@ void establishConnection(){
     }
 
     printf("[+]Connected to Server.\n");
-    checkFile();
+
+    pthread_create(&t1, NULL, checkFile, NULL);//create threads
+    pthread_create(&t2, NULL, receiveMessage, NULL);
+
+    pthread_join(t1, NULL); // wait the thread, wait the main
+    pthread_join(t2, NULL); 
 }
 
 int main()
 {
+
     establishConnection();
 
     return 0;
