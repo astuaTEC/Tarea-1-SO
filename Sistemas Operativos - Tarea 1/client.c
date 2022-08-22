@@ -13,6 +13,7 @@ char ip[15]; // = "192.168.100.97";
 int port; // = 8080;
 int e;
 int sockfd;
+int *flag = 0;
 struct sockaddr_in server_addr;
 FILE *fp;
 char filename[40]; // = "send.txt";
@@ -28,7 +29,7 @@ int fsize(FILE *fp){
     return sz;
 }
 
-void send_file(FILE *fp, int sockfd)
+void send_file(FILE *fp, int sockfd, char *name)
 {
     int n, fileSize;
 
@@ -37,6 +38,8 @@ void send_file(FILE *fp, int sockfd)
     char data[SIZE] = {0};
 
     char totalFile[fileSize];
+
+    strcat(totalFile, strcat(name, ";"));
 
     while (fgets(data, SIZE, fp) != NULL)
     {
@@ -66,7 +69,7 @@ void *checkFile(){
         checkFile();
     }
 
-    send_file(fp, sockfd);
+    send_file(fp, sockfd, filename);
     printf("[+]File data sent successfully.\n");
     fp = NULL;
     
@@ -85,8 +88,8 @@ void *checkFile(){
     {
         printf("[+]Closing the connection.\n");
         close(sockfd);
-        pthread_exit(&t1);
-        pthread_exit(&t2);
+        *flag = 1;
+        pthread_exit(NULL);
     }
 }
 
@@ -94,15 +97,21 @@ void *receiveMessage(){
     int n;
     char buffer[4096]; 
     while(1){
+        if(flag){
+            break;
+        }
+
         n = read(sockfd, buffer, 4096);
         if(n < 0){
             perror("Error on reading");
         }
 
-        printf("Server: %s", buffer);
-        bzero(buffer, 4096);
+        if(strlen(buffer) > 0){
+            printf("Server: %s\n", buffer);
+            bzero(buffer, 4096);
+        }
 
-        sleep(1);
+        sleep(0.05);
     }
 }
 

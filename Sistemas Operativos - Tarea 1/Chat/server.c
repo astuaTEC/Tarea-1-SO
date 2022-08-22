@@ -7,21 +7,46 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <sys/stat.h>
+#include "config.h"
+
 
 void error(const char *msg){
     perror(msg);
     exit(0);
 }
 
+void write_file(char *buffer)
+{
+
+    char copyBuffer[MAX_BUFFER];
+    strcpy(copyBuffer, buffer);
+    FILE *fp;
+    char *chunk = strtok(copyBuffer, ";");
+    char filename[50];
+    strcat(filename, DIRECTORY);
+    strcat(filename, chunk);
+
+    fp = fopen(filename, "w");
+    
+    chunk = strtok(NULL, "");
+
+    fprintf(fp, "%s", chunk);
+    bzero(copyBuffer, MAX_BUFFER);
+    bzero(filename, 50);
+}
+
+
 int main(int argc, char *argv[]){
 
-    if (argc < 2){
-        fprintf(stderr, "Port not provided. Program terminated\n");
-        exit(1);
-    }
+    // if (argc < 2){
+    //     fprintf(stderr, "Port not provided. Program terminated\n");
+    //     exit(1);
+    // }
+    mkdir(DIRECTORY, S_IRWXU);
 
     int sockfd, newSockfd, port, n;
-    char buffer[255], inBuffer[65000];
+    char buffer[BUFFERSIZE], inBuffer[MAX_BUFFER];
 
     struct sockaddr_in serv_addr, cli_addr;
     socklen_t clilen;
@@ -32,11 +57,10 @@ int main(int argc, char *argv[]){
     }
 
     bzero((char *)&serv_addr, sizeof(serv_addr));
-    port = atoi(argv[1]);
-
+    // port = atoi(argv[1]);
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = inet_addr("192.168.100.4");
-    serv_addr.sin_port = port;
+    serv_addr.sin_addr.s_addr = inet_addr(IP);
+    serv_addr.sin_port = PORT;
 
     if(bind(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr) ) < 0){
         error("Binding Failed");
@@ -56,27 +80,39 @@ int main(int argc, char *argv[]){
 
     while (1)
     {
-        bzero(inBuffer, 65000);
-        n = read(newSockfd, inBuffer, 65000);
+        bzero(inBuffer, MAX_BUFFER);
+        n = read(newSockfd, inBuffer, MAX_BUFFER);
         if (n < 0)
         {
             error("Error on reading");
         }
 
-        printf("Client: %s", inBuffer);
+        if (strlen(inBuffer) > 0)
+        {
+            write_file(inBuffer);
+            n = write(newSockfd, "Archivo recibido", 17);
+            if (n < 0)
+            {
+                error("Error on writing");
+            }
+        }
+
+        sleep(1);
         
-        bzero(buffer, 255);
-        fgets(buffer, 255, stdin);
+        /*bzero(buffer, BUFFERSIZE);
+        fgets(buffer, BUFFERSIZE, stdin);
         n = write(newSockfd, buffer, strlen(buffer));
         if (n < 0)
         {
             error("Error on writing");
-        }
+        }*/
     }
 
-    close(sockfd);
-    main(argc, argv);
 
+    close(sockfd);
+    close(newSockfd);
+
+    // main(argc, argv);
     return 0;
 
 }
