@@ -73,23 +73,34 @@ void *checkFile(){
     fp = NULL;
     
     char resp;
+    bzero(&resp, 1);
 
-    while( strcmp(&resp, "y") != 0 && strcmp(&resp, "n") != 0) { 
-        scanf("%c", &resp);
+    printf("Le gustaria enviar un archivo adicional? [y/n]\n");
+    scanf("%c", &resp);
+
+    while (strcmp(&resp, "y") != 0 & strcmp(&resp, "n") != 0)
+    {
+
         printf("Le gustaria enviar un archivo adicional? [y/n]\n");
+        scanf("%c", &resp);
+
     }
 
     if (strcmp(&resp, "y") == 0)
     {
         checkFile();
+        bzero(&resp, 1);
     }
+
     else if (strcmp(&resp, "n") == 0)
     {
         printf("[+]Closing the connection.\n");
         close(sockfd);
+        bzero(&resp, 1);
         pthread_cancel(t1);
         pthread_cancel(t2);
     }
+    
 }
 
 void *receiveMessage(){

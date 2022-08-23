@@ -23,9 +23,13 @@ void write_file(char *buffer)
 
     char copyBuffer[MAX_BUFFER];
     strcpy(copyBuffer, buffer);
+    
     FILE *fp;
     char *chunk = strtok(copyBuffer, ";");
+
     char filename[50];
+    bzero(filename, 50);
+
     strcat(filename, DIRECTORY);
     strcat(filename, chunk);
 
@@ -89,11 +93,18 @@ int main(int argc, char *argv[]){
 
     while (1)
     {
+
         bzero(inBuffer, MAX_BUFFER);
         n = read(newSockfd, inBuffer, MAX_BUFFER);
+
         if (n < 0)
         {
             error("Error on reading");
+        }
+
+        else if(n == 0){
+            printf("Closing connection...\n");
+            newSockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
         }
 
         if (strlen(inBuffer) > 0)
@@ -112,9 +123,7 @@ int main(int argc, char *argv[]){
     }
 
     close(sockfd);
-    close(newSockfd);
 
-    // main(argc, argv);
     return 0;
 
 }
