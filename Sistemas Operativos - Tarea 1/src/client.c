@@ -83,6 +83,7 @@ void *checkFile(){
 
         printf("Le gustaria enviar un archivo adicional? [y/n]\n");
         scanf("%c", &resp);
+        sleep(1);
 
     }
 
@@ -114,7 +115,7 @@ void *receiveMessage(){
         }
 
         if(strlen(buffer) > 0){
-            printf("Server: %s\n", buffer);
+            printf("%s\n", buffer);
             bzero(buffer, 4096);
         }
 
