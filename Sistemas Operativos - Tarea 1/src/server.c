@@ -10,12 +10,29 @@
 #include <sys/stat.h>
 #include "config.h"
 #include "consonantCounter.h"
+#include <time.h>
 
 char consonantsMessage[1024];
+
+void logger(const char *tag, const char *message)
+{
+
+    FILE *fp;
+    time_t now;
+
+    fp = fopen("logger.log", "a");
+
+    time(&now);
+    fprintf(fp , "%s [%s]: %s\n", ctime(&now), tag, message);
+
+    fclose(fp);
+    
+}
 
 void error(const char *msg)
 {
     perror(msg);
+    logger("ERROR", msg);
     exit(0);
 }
 
@@ -44,11 +61,15 @@ void readSysCalls(int newSockfd)
     strcat(totalFile, "\n");
     strcat(totalFile, consonantsMessage);
 
+    fclose(fp);
+
     n = write(newSockfd, totalFile, strlen(totalFile));
     if (n < 0)
     {
         error("Error on writing");
     }
+
+    logger("DATA", "Sending message to client");
 
     bzero(totalFile, strlen(totalFile));
     bzero(consonantsMessage, 1024);
@@ -76,6 +97,8 @@ void write_file(char *buffer, int newSockfd)
 
     fprintf(fp, "%s", chunk);
 
+    logger("WRITING", "A new File was written");
+
     strcat(consonantsMessage, "The number of consonants in the the file are: ");
     sprintf(consonants, "%d", consonantCounter(chunk));
     strcat(consonantsMessage, consonants);
@@ -88,6 +111,7 @@ void write_file(char *buffer, int newSockfd)
     strcat(command, filename);
 
     system(command);
+    logger("SYSTEM", "Execution of Strace");
 
     readSysCalls(newSockfd);
 
@@ -99,11 +123,14 @@ void write_file(char *buffer, int newSockfd)
 
 int main(int argc, char *argv[])
 {
+    FILE *fp;
 
-    // if (argc < 2){
-    //     fprintf(stderr, "Port not provided. Program terminated\n");
-    //     exit(1);
-    // }
+    fp = fopen("logger.log", "w");
+
+    fprintf(fp, "%s", "");
+
+    fclose(fp);
+
     mkdir(DIRECTORY, S_IRWXU);
 
     int sockfd, newSockfd, n;
@@ -119,7 +146,6 @@ int main(int argc, char *argv[])
     }
 
     bzero((char *)&serv_addr, sizeof(serv_addr));
-    // port = atoi(argv[1]);
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = inet_addr(IP);
     serv_addr.sin_port = PORT;
@@ -136,6 +162,7 @@ int main(int argc, char *argv[])
     clilen = sizeof(cli_addr);
 
     newSockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
+    logger("CONNECTION", "New client was acepted");
 
     if (newSockfd < 0)
     {
@@ -157,16 +184,13 @@ int main(int argc, char *argv[])
         {
             printf("Closing connection...\n");
             newSockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
+            logger("CONNECTION", "New client was acepted");
         }
 
         if (strlen(inBuffer) > 0)
         {
+            logger("DATA", "Receiving message from client");
             write_file(inBuffer, newSockfd);
-            // n = write(newSockfd, consonants, strlen(consonants));
-            // if (n < 0)
-            // {
-            //     error("Error on writing");
-            // }
         }
 
         sleep(0.2);

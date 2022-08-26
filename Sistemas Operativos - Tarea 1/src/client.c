@@ -15,7 +15,7 @@ int e;
 int sockfd;
 struct sockaddr_in server_addr;
 FILE *fp;
-char filename[40]; // = "send.txt";
+char filename[50]; // = "send.txt";
 pthread_t t1, t2; // threads are to execute send and recive simultaneusly
 
 // https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
@@ -58,6 +58,7 @@ void send_file(FILE *fp, int sockfd, char *name)
 
 void *checkFile(){
 
+    bzero(filename, 50);
     printf("Ingrese el nombre del archivo: ");
     scanf("%s", filename);
 
@@ -89,8 +90,8 @@ void *checkFile(){
 
     if (strcmp(&resp, "y") == 0)
     {
-        checkFile();
         bzero(&resp, 1);
+        checkFile();
     }
 
     else if (strcmp(&resp, "n") == 0)
