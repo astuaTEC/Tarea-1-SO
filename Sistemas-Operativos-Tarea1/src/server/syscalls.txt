@@ -1,22 +1,22 @@
     seconds     calls syscall
 ----------- --------- ----------------
-   0,000000         4 read
-   0,000000         1 write
-   0,000000         3 close
-   0,000000         8 mmap
-   0,000000         3 mprotect
-   0,000000         1 munmap
-   0,000000         3 brk
-   0,000000         4 pread64
+   0,000076        10 read
+   0,000070         8 mmap
+   0,000036         3 mprotect
+   0,000035         1 munmap
+   0,000034         4 pread64
+   0,000023         4 newfstatat
+   0,000021         1 write
+   0,000017         3 openat
+   0,000014         3 close
+   0,000013         3 brk
+   0,000010         1 getrandom
+   0,000006         1 prlimit64
+   0,000005         2 arch_prctl
+   0,000005         1 set_tid_address
+   0,000005         1 set_robust_list
+   0,000005         1 rseq
    0,000000         1 access
    0,000000         1 execve
-   0,000000         2 arch_prctl
-   0,000000         1 set_tid_address
-   0,000000         3 openat
-   0,000000         4 newfstatat
-   0,000000         1 set_robust_list
-   0,000000         1 prlimit64
-   0,000000         1 getrandom
-   0,000000         1 rseq
 ----------- --------- ----------------
-   0,000000        43 total
+   0,000375        49 total

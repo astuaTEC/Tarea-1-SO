@@ -1,0 +1,44 @@
+Sat Aug 27 17:09:05 2022
+ [CONNECTION]: New client was acepted
+Sat Aug 27 17:09:13 2022
+ [DATA]: Receiving message from client
+Sat Aug 27 17:09:13 2022
+ [WRITING]: A new File was written
+Sat Aug 27 17:09:13 2022
+ [SYSTEM]: Execution of Strace
+Sat Aug 27 17:09:13 2022
+ [DATA]: Sending message to client
+Sat Aug 27 17:09:22 2022
+ [DATA]: Receiving message from client
+Sat Aug 27 17:09:22 2022
+ [WRITING]: A new File was written
+Sat Aug 27 17:09:22 2022
+ [SYSTEM]: Execution of Strace
+Sat Aug 27 17:09:22 2022
+ [DATA]: Sending message to client
+Sat Aug 27 17:09:42 2022
+ [DATA]: Receiving message from client
+Sat Aug 27 17:09:42 2022
+ [WRITING]: A new File was written
+Sat Aug 27 17:09:42 2022
+ [SYSTEM]: Execution of Strace
+Sat Aug 27 17:09:42 2022
+ [DATA]: Sending message to client
+Sat Aug 27 17:09:54 2022
+ [CONNECTION]: New client was acepted
+Sat Aug 27 17:09:59 2022
+ [DATA]: Receiving message from client
+Sat Aug 27 17:09:59 2022
+ [WRITING]: A new File was written
+Sat Aug 27 17:09:59 2022
+ [SYSTEM]: Execution of Strace
+Sat Aug 27 17:09:59 2022
+ [DATA]: Sending message to client
+Sat Aug 27 17:10:10 2022
+ [DATA]: Receiving message from client
+Sat Aug 27 17:10:10 2022
+ [WRITING]: A new File was written
+Sat Aug 27 17:10:10 2022
+ [SYSTEM]: Execution of Strace
+Sat Aug 27 17:10:10 2022
+ [DATA]: Sending message to client

@@ -13,24 +13,34 @@
 #include <time.h>
 
 char consonantsMessage[1024];
-
 char DIRECTORY[100];
 
+/**
+ * @brief Function to log a message in to the log file
+ * 
+ * @param tag identifier for the message
+ * @param message the message to log
+ */
 void logger(const char *tag, const char *message)
 {
 
     FILE *fp;
     time_t now;
 
-    fp = fopen("logger.log", "a");
+    fp = fopen("logger.log", "a"); // open the file
 
     time(&now);
-    fprintf(fp , "%s [%s]: %s\n", ctime(&now), tag, message);
+    fprintf(fp , "%s [%s]: %s\n", ctime(&now), tag, message); // append the message
 
     fclose(fp);
     
 }
 
+/**
+ * @brief Function to print and log the errors
+ * 
+ * @param msg the error message
+ */
 void error(const char *msg)
 {
     perror(msg);
@@ -38,13 +48,20 @@ void error(const char *msg)
     exit(0);
 }
 
+/**
+ * @brief function to read the system calls used to calculate the
+ * consonats in a file using Strace
+ * 
+ * @param newSockfd socket number to send a message to client
+ */
 void readSysCalls(int newSockfd)
 {
 
     int n;
     FILE *fp;
     char line[1024] = {0};
-    char totalFile[24000];
+    char totalFile[24000]; // this is the final message to send to client
+                           // with the syscalls and number of consonants
 
     fp = fopen("syscalls.txt", "r"); // 'r' opens the file in read mode
 
@@ -56,16 +73,16 @@ void readSysCalls(int newSockfd)
 
     while (fgets(line, 1024, fp) != NULL)
     {
-        strcat(totalFile, line);
+        strcat(totalFile, line); // concat every file's line
         bzero(line, 1024);
     }
 
     strcat(totalFile, "\n");
-    strcat(totalFile, consonantsMessage);
+    strcat(totalFile, consonantsMessage); // concat the number of consonants on a message format
 
     fclose(fp);
 
-    n = write(newSockfd, totalFile, strlen(totalFile));
+    n = write(newSockfd, totalFile, strlen(totalFile)); // send the message to client
     if (n < 0)
     {
         error("Error on writing");
@@ -78,44 +95,52 @@ void readSysCalls(int newSockfd)
     bzero(line, 1024);
 }
 
+/**
+ * @brief function to save the file coming from the client
+ * 
+ * @param buffer the message from client
+ * @param newSockfd socket number to send a message to client
+ */
 void write_file(char *buffer, int newSockfd)
 {
 
     char copyBuffer[MAX_BUFFER], consonants[100];
-    strcpy(copyBuffer, buffer);
+    strcpy(copyBuffer, buffer); // a copy to modify separate
 
     FILE *fp;
-    char *chunk = strtok(copyBuffer, ";");
+    char *chunk = strtok(copyBuffer, ";"); // extract the file name from "<filename>;ETCETC..."
 
     char filename[50];
     bzero(filename, 50);
 
-    strcat(filename, DIRECTORY);
-    strcat(filename, chunk);
+    strcat(filename, DIRECTORY); // Appends the directory to save the files
+    strcat(filename, chunk); // appends the file name to directory
 
     fp = fopen(filename, "w");
 
-    chunk = strtok(NULL, ";");
+    chunk = strtok(NULL, ";"); // extract the rest of the message (file content)
 
-    fprintf(fp, "%s", chunk);
+    fprintf(fp, "%s", chunk); // write the content
 
     logger("WRITING", "A new File was written");
 
+    // Prepare the consonant counter message
     strcat(consonantsMessage, "The number of consonants in the the file are: ");
-    sprintf(consonants, "%d", consonantCounter(chunk));
+    sprintf(consonants, "%d", consonantCounter(chunk)); // call the function to count the consonats
     strcat(consonantsMessage, consonants);
 
     fclose(fp);
 
     char command[200];
 
+    // prepare a command to get the system calls used by consonant counter function
     strcat(command, "strace -c -U total-time,calls,syscall -o syscalls.txt ./counter.out ");
     strcat(command, filename);
 
-    system(command);
+    system(command); // exec the command
     logger("SYSTEM", "Execution of Strace");
 
-    readSysCalls(newSockfd);
+    readSysCalls(newSockfd); // call the function to read and send the syscalls to client
 
     bzero(copyBuffer, MAX_BUFFER);
     bzero(filename, 50);
@@ -123,23 +148,24 @@ void write_file(char *buffer, int newSockfd)
     bzero(chunk, strlen(chunk));
 }
 
-int main(int argc, char *argv[])
+/**
+ * @brief Function to open the server connection
+ * 
+ * @param argv argv[1]: port, argv[2]: directory to save the files
+ * @return int state
+ */
+int openConnection(char *argv[])
 {
-
-    if(argc < 3){
-        error("Missing arguments");
-    }
-
     FILE *fp;
 
     fp = fopen("logger.log", "w");
 
-    fprintf(fp, "%s", "");
+    fprintf(fp, "%s", ""); // clear the logger
 
     fclose(fp);
 
     bzero(DIRECTORY, 100);
-    strcat(DIRECTORY, argv[2]);
+    strcat(DIRECTORY, argv[2]); // assign the directory
 
     mkdir(DIRECTORY, S_IRWXU);
 
@@ -149,7 +175,7 @@ int main(int argc, char *argv[])
     struct sockaddr_in serv_addr, cli_addr;
     socklen_t clilen;
 
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    sockfd = socket(AF_INET, SOCK_STREAM, 0); // create the socket
     if (sockfd < 0)
     {
         error("Error opening socket");
@@ -158,7 +184,7 @@ int main(int argc, char *argv[])
     bzero((char *)&serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = inet_addr(IP);
-    serv_addr.sin_port = atoi(argv[1]);
+    serv_addr.sin_port = atoi(argv[1]); // use the port from arguments
 
     if (bind(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     {
@@ -171,7 +197,7 @@ int main(int argc, char *argv[])
 
     clilen = sizeof(cli_addr);
 
-    newSockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
+    newSockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen); // accept a client
     logger("CONNECTION", "New client was acepted");
 
     if (newSockfd < 0)
@@ -193,11 +219,11 @@ int main(int argc, char *argv[])
         else if (n == 0)
         {
             printf("Closing connection...\n");
-            newSockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
+            newSockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen); // accept the client again if he was disconnected
             logger("CONNECTION", "New client was acepted");
         }
 
-        if (strlen(inBuffer) > 0)
+        if (strlen(inBuffer) > 0) // receive a message from client
         {
             logger("DATA", "Receiving message from client");
             write_file(inBuffer, newSockfd);
@@ -207,6 +233,19 @@ int main(int argc, char *argv[])
     }
 
     close(sockfd);
+
+    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+
+    if(argc < 3){
+        error("Missing arguments");
+        return 1;
+    }
+
+    openConnection(argv);
 
     return 0;
 }
