@@ -1,0 +1,22 @@
+# this is /lib/systemd/system/your_cmd.service
+# (or /lib/systemd/system/your_cmd.service dependent on 
+#  your linux distribution flavor )
+[Unit]
+Description=DocServer
+Wants=network.target
+After=network.target syslog.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+# see man systemd.service 
+Type=simple
+WorkingDirectory=/home/saymon/Documents/C-Programs/Sistemas-Operativos-Tarea1/src/server
+EnvironmentFile=/home/saymon/Documents/C-Programs/Sistemas-Operativos-Tarea1/src/daemon/config.conf
+ExecStart=/home/saymon/Documents/C-Programs/Sistemas-Operativos-Tarea1/src/server/server $PORT $DIRECTORY
+RemainAfterExit=true
+KillMode=process
+StandardOutput=journal
+Restart=on-failure
+RestartSec=10

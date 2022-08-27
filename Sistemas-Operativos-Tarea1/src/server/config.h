@@ -1,0 +1,4 @@
+#define MAX_BUFFER 65000
+#define BUFFERSIZE 1024
+#define PORT 9000
+#define IP "192.168.100.97"
