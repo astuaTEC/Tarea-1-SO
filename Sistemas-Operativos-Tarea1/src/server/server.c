@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
     bzero(DIRECTORY, 100);
     strcat(DIRECTORY, argv[2]);
 
-    mkdir(DIRECTORY, S_IRWXO);
+    mkdir(DIRECTORY, S_IRWXU);
 
     int sockfd, newSockfd, n;
     char inBuffer[MAX_BUFFER];
