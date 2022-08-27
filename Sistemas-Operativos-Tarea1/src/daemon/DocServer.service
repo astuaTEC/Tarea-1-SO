@@ -14,8 +14,7 @@ Type=simple
 WorkingDirectory=/home/saymon/Documents/C-Programs/Sistemas-Operativos-Tarea1/src/server
 ExecStart=/home/saymon/Documents/C-Programs/Sistemas-Operativos-Tarea1/src/server/server
 RemainAfterExit=true
-ExecStop=/home/saymon/Documents/C Programs/Sistemas Operativos - Tarea 1/src/daemon/DocServer-stop.sh
 StandardOutput=journal
 Restart=on-failure
-RestartSec=1
+RestartSec=10
 
