@@ -1,5 +1,0 @@
-gcc -Wall -c consonantCounter.c
-gcc -Wall -c server.c
-gcc -o ser.out server.o consonantCounter.o
-
-gcc client.c -o client.out -lpthread
