@@ -14,6 +14,8 @@
 
 char consonantsMessage[1024];
 
+char DIRECTORY[100];
+
 void logger(const char *tag, const char *message)
 {
 
@@ -123,6 +125,11 @@ void write_file(char *buffer, int newSockfd)
 
 int main(int argc, char *argv[])
 {
+
+    if(argc < 3){
+        error("Missing arguments");
+    }
+
     FILE *fp;
 
     fp = fopen("logger.log", "w");
@@ -131,7 +138,10 @@ int main(int argc, char *argv[])
 
     fclose(fp);
 
-    mkdir(DIRECTORY, S_IRWXU);
+    bzero(DIRECTORY, 100);
+    strcat(DIRECTORY, argv[2]);
+
+    mkdir(DIRECTORY, S_IRWXO);
 
     int sockfd, newSockfd, n;
     char inBuffer[MAX_BUFFER];
@@ -148,7 +158,7 @@ int main(int argc, char *argv[])
     bzero((char *)&serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = inet_addr(IP);
-    serv_addr.sin_port = PORT;
+    serv_addr.sin_port = atoi(argv[1]);
 
     if (bind(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     {
