@@ -154,7 +154,7 @@ void write_file(char *buffer, int newSockfd)
  * @param argv argv[1]: port, argv[2]: directory to save the files
  * @return int state
  */
-int openConnection(char *argv[])
+void openConnection(char *argv[])
 {
     FILE *fp;
 
@@ -234,7 +234,6 @@ int openConnection(char *argv[])
 
     close(sockfd);
 
-    return 0;
 }
 
 int main(int argc, char *argv[])
